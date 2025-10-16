@@ -1,0 +1,38 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+pnpm-lock.yaml
+package-lock.json
+
+# Frontend build
+/frontend/dist/
+/frontend/.vite/
+
+# PHP / Composer
+/backend/vendor/
+/vendor/
+composer.lock
+
+# Environment files
+.env
+.env.*
+.env.local
+
+# Logs
+logs/
+*.log
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker override files
+docker-compose.override.yml
+
+# Build artifacts
+dist/

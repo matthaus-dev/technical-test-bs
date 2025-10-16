@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    container_name: bussola-backend
+    ports:
+      - "8000:80"
+    volumes:
+      - ../backend:/var/www/html
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
+    container_name: bussola-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ../frontend:/app
+    environment:
+      - NODE_ENV=production
+
+  phpunit:
+    image: php:8.4-cli
+    container_name: bussola-phpunit
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+    command: ["bash", "-lc", "./vendor/bin/phpunit tests/Unit --testdox"]
+
+# networks
+networks:
+  default:
+    driver: bridge

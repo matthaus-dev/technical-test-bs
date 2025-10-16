@@ -1,0 +1,15 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPStorm / editors
+/.idea/
+/.vscode/
+.DS_Store
+
+# Logs
+*.log
+log/
+
+# PHP build artifacts
+*.phar
