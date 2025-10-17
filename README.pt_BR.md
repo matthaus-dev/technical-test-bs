@@ -47,14 +47,3 @@ Testes (backend)
 cd backend
 ./vendor/bin/phpunit tests/Unit --testdox
 ```
-
-Observações e solução de problemas rápidos
-- Se receber 403: verifique DocumentRoot apontando para `public`, permissões e `.htaccess`. O Dockerfile já altera o DocumentRoot para `/var/www/html/public`.
-- Se rotas (ex.: /products) retornarem 404 ou 405: confirme que o Apache está redirecionando requisições para `public/index.php` (ver `.htaccess`) e que o rewrite module está ativo. Dentro do container, rode:
-```powershell
-docker compose exec backend bash
-curl -i http://localhost/products
-```
-- Se o frontend não achar a API, confira `vite.config.ts` ou variáveis de ambiente (`VITE_API_BASE_URL`) apontando para `http://localhost:8000`.
-
-Dúvidas ou logs de erro (apache/php/curl) podem ser colados aqui para diagnóstico.

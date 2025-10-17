@@ -43,8 +43,6 @@ npm install
 npm run dev
 ```
 
-By default the frontend uses `http://localhost:8000` as the API base. If you changed the backend port, update `frontend/.env` or `VITE_API_BASE_URL`.
-
 ## Running tests (backend)
 
 Inside `backend/` run:
@@ -69,13 +67,3 @@ Run backend unit tests inside the phpunit container:
 ```bash
 docker compose -f docker/docker-compose.yml run --rm phpunit
 ```
-
-## Notes
-
-- The API contract is English-only now: `products`, `payment_method`, `installments`, and the response keys described above.
-- No database is required; products are in-memory. The backend is stateless for this example.
-- If you want, I can add a Makefile with shortcuts for the common commands or add an example `VITE_API_BASE_URL` env file.
-
-## Portuguese quick notes
-
-Se preferir instruções em português: o backend roda em `backend/` com `php -S localhost:8000 -t public`. O frontend roda com Vite em `frontend/`.
