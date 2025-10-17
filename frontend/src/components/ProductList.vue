@@ -3,6 +3,7 @@
     <h2 style="font-weight: 600; margin-bottom: 8px">Produtos</h2>
     <div class="products-grid">
       <div v-for="product in products" :key="product.name" class="product-card">
+        <img src="https://placehold.co/600x400" :alt="product.name" />
         <div>
           <div class="product-name">{{ product.name }}</div>
           <div class="product-price">R$ {{ product.price.toFixed(2) }}</div>

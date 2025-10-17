@@ -54,18 +54,15 @@
     <div v-if="items.length > 0">
       <div class="mt-4">
         <label class="muted block mb-1">Forma de pagamento</label>
-        <select v-model="payment_method" class="w-full border rounded px-2 py-1">
+        <select v-model="payment_method" >
           <option value="PIX">Pix (10% desconto)</option>
           <option value="CARTAO_CREDITO">Cartão de Crédito</option>
         </select>
       </div>
 
       <div v-if="payment_method === 'CARTAO_CREDITO'" class="mt-3">
-        <label class="muted block mb-1">Parcelas</label>
-        <select
-          v-model.number="parcelas"
-          class="w-full border rounded px-2 py-1"
-        >
+        <label class="muted block mb-1">Quantidade de Parcelas</label>
+        <select v-model.number="parcelas">
           <option v-for="n in 12" :key="n" :value="n">{{ n }}x</option>
         </select>
       </div>
@@ -87,12 +84,11 @@
       <div class="mt-2">
         Total Carrinho: <strong>R$ {{ result.principal.toFixed(2) }}</strong>
       </div>
-      <div>Forma de Pagamento: {{ result.payment_method }}</div>
-      <div v-show="payment_method == 'CARTAO_CREDITO'">Parcelas: {{ result.installments }}</div>
-      <div class="text-xl font-semibold mt-2">
+      <div class="mt-3">Forma de Pagamento: {{ result.payment_method }}</div>
+      <div class="mt-3" v-show="payment_method == 'CARTAO_CREDITO'">Parcelas: {{ result.installments }} x  R$ {{ result.installment_value.toFixed(2) }}</div>
+      <div class="mt-3 text-lg">
         SubTotal : R$ {{ result.total_amount.toFixed(2) }}
-      </div>
-      <pre class="muted mt-2">{{ result.details }}</pre>
+      </div>      
     </div>
   </div>
 </template>
@@ -157,6 +153,7 @@ export default defineComponent({
           principal: data.principal,
           payment_method: data.payment_method,
           installments: data.installments,
+          installment_value: data.installment_value,
           details: data.details,
         };
       } catch (e) {
