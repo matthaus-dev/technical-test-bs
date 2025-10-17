@@ -2,13 +2,13 @@
   <div>
     <h2 style="font-weight: 600; margin-bottom: 8px">Produtos</h2>
     <div class="products-grid">
-      <div v-for="p in products" :key="p.name" class="product-card">
+      <div v-for="product in products" :key="product.name" class="product-card">
         <div>
-          <div class="product-name">{{ p.name }}</div>
-          <div class="product-price">R$ {{ p.price.toFixed(2) }}</div>
+          <div class="product-name">{{ product.name }}</div>
+          <div class="product-price">R$ {{ product.price.toFixed(2) }}</div>
         </div>
         <div style="margin-top: 8px; display: flex; justify-content: flex-end">
-          <button class="btn" @click="$emit('add', p)">Adicionar</button>
+          <button class="btn" @click="$emit('add', product)">Adicionar</button>
         </div>
       </div>
     </div>
@@ -17,7 +17,6 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import axios from "axios";
 import api from "../services/api";
 
 export default defineComponent({
@@ -25,21 +24,20 @@ export default defineComponent({
   setup() {
     const products = ref<Array<any>>([]);
 
-    async function load() {
+    async function loadProducts() {
       try {
-        const res = await api.get("/products");
-        // Accept products with English keys (name, price) or Portuguese (nome, valor)
-        const raw = res.data.products || [];
-        products.value = raw.map((p: any) => ({
-          name: p.name ?? p.nome,
-          price: p.price ?? p.valor,
+        const response = await api.get("/products");
+        const rawProducts = response.data.products || [];
+        products.value = rawProducts.map((rawProduct: any) => ({
+          name: rawProduct.name ?? rawProduct.nome,
+          price: rawProduct.price ?? rawProduct.valor,
         }));
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
       }
     }
 
-    onMounted(load);
+    onMounted(loadProducts);
 
     return { products };
   },

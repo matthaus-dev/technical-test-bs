@@ -6,10 +6,10 @@
     </div>
 
     <ul class="cart-items">
-      <li v-for="(it, idx) in items" :key="it.name" class="item-row">
+      <li v-for="(item, index) in items" :key="item.name" class="item-row">
         <div class="item-name" style="flex: 1">
-          <div class="font-medium">{{ it.name }}</div>
-          <div class="muted-small">R$ {{ it.price.toFixed(2) }}</div>
+          <div class="font-medium">{{ item.name }}</div>
+          <div class="muted-small">R$ {{ item.price.toFixed(2) }}</div>
         </div>
 
         <div
@@ -18,17 +18,17 @@
         >
           <button
             class="circle-btn"
-            @click="decrement(idx)"
-            :aria-label="`Diminuir quantidade de ${it.name}`"
-            :disabled="it.quantity <= 1"
+            @click="decrement(index)"
+            :aria-label="`Diminuir quantidade de ${item.name}`"
+            :disabled="item.quantity <= 1"
           >
             -
           </button>
-          <div>{{ it.quantity }}</div>
+          <div>{{ item.quantity }}</div>
           <button
             class="circle-btn"
-            @click="increment(idx)"
-            :aria-label="`Aumentar quantidade de ${it.name}`"
+            @click="increment(index)"
+            :aria-label="`Aumentar quantidade de ${item.name}`"
           >
             +
           </button>
@@ -36,13 +36,13 @@
 
         <div style="width: 120px; text-align: right">
           <div class="item-subtotal">
-            R$ {{ (it.price * it.quantity).toFixed(2) }}
+            R$ {{ (item.price * item.quantity).toFixed(2) }}
           </div>
           <div>
             <button
               class="btn-danger"
-              @click="remove(idx)"
-              :aria-label="`Remover ${it.name}`"
+              @click="remove(index)"
+              :aria-label="`Remover ${item.name}`"
             >
               Remover
             </button>
@@ -54,13 +54,13 @@
     <div v-if="items.length > 0">
       <div class="mt-4">
         <label class="muted block mb-1">Forma de pagamento</label>
-        <select v-model="metodo" class="w-full border rounded px-2 py-1">
+        <select v-model="payment_method" class="w-full border rounded px-2 py-1">
           <option value="PIX">Pix (10% desconto)</option>
           <option value="CARTAO_CREDITO">Cartão de Crédito</option>
         </select>
       </div>
 
-      <div v-if="metodo === 'CARTAO_CREDITO'" class="mt-3">
+      <div v-if="payment_method === 'CARTAO_CREDITO'" class="mt-3">
         <label class="muted block mb-1">Parcelas</label>
         <select
           v-model.number="parcelas"
@@ -82,15 +82,15 @@
 
     <div v-if="loading" class="mt-2 muted">Calculando...</div>
 
-    <div v-if="result" class="mt-4 border-t pt-3">
+    <div v-if="result && items.length > 0" class="mt-4 border-t pt-3">
       <h3 class="font-medium">Resumo</h3>
       <div class="mt-2">
-        Principal: <strong>R$ {{ result.principal.toFixed(2) }}</strong>
+        Total Carrinho: <strong>R$ {{ result.principal.toFixed(2) }}</strong>
       </div>
-      <div>Metodo: {{ result.payment_method }}</div>
-      <div>Installments: {{ result.installments }}</div>
+      <div>Forma de Pagamento: {{ result.payment_method }}</div>
+      <div v-show="payment_method == 'CARTAO_CREDITO'">Parcelas: {{ result.installments }}</div>
       <div class="text-xl font-semibold mt-2">
-        Total Amount: R$ {{ result.total_amount.toFixed(2) }}
+        SubTotal : R$ {{ result.total_amount.toFixed(2) }}
       </div>
       <pre class="muted mt-2">{{ result.details }}</pre>
     </div>
@@ -98,41 +98,43 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import api from "../services/api";
 
 export default defineComponent({
   props: { items: { type: Array, required: true } },
   emits: ["change"],
   setup(props, { emit }) {
-    const metodo = ref("PIX");
+    const payment_method = ref("PIX");
     const parcelas = ref(1);
     const loading = ref(false);
     const result = ref<any | null>(null);
 
     watch(
       () => props.items,
-      (v) => {
-        // noop for now
+      (newItems) => {
+        console.log('Items changed:', newItems);
       }
     );
 
-    function remove(idx: number) {
-      const copy = [...props.items];
-      copy.splice(idx, 1);
-      emit("change", copy);
+    function remove(index: number) {
+      const updatedItems = [...props.items];
+      updatedItems.splice(index, 1);
+      emit("change", updatedItems);
     }
 
-    function increment(idx: number) {
-      const copy = props.items.map((x: any) => ({ ...x }));
-      copy[idx].quantidade = (copy[idx].quantidade || 0) + 1;
-      emit("change", copy);
+    function increment(index: number) {
+      const copiedItems = props.items.map((originalItem: any) => ({ ...originalItem }));
+      copiedItems[index].quantity = (copiedItems[index].quantity || 0) + 1;
+      emit("change", copiedItems);
     }
 
-    function decrement(idx: number) {
-      const copy = props.items.map((x: any) => ({ ...x }));
-      if ((copy[idx].quantidade || 0) > 1) copy[idx].quantidade -= 1;
-      emit("change", copy);
+    function decrement(index: number) {
+      const copiedItems = props.items.map((originalItem: any) => ({ ...originalItem }));
+      if ((copiedItems[index].quantity || 0) > 1) {
+        copiedItems[index].quantity -= 1;
+      }
+      emit("change", copiedItems);
     }
 
     async function calculate() {
@@ -140,12 +142,12 @@ export default defineComponent({
       result.value = null;
       try {
         const payload = {
-          products: props.items.map((i: any) => ({
-            name: i.name,
-            price: i.price,
-            quantity: i.quantity,
+          products: props.items.map((product: any) => ({
+            name: product.name,
+            price: product.price,
+            quantity: product.quantity,
           })),
-          payment_method: metodo.value,
+          payment_method: payment_method.value,
           installments: parcelas.value,
         };
         const res = await api.post("/cart/total", payload);
@@ -165,7 +167,7 @@ export default defineComponent({
     }
 
     return {
-      metodo,
+      payment_method,
       parcelas,
       remove,
       increment,

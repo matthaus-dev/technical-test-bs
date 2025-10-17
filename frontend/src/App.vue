@@ -12,10 +12,10 @@
     >
       <h1 class="text-2xl font-semibold">Carrinho de Compras</h1>
       <div>
-        <button v-if="view === 'products'" class="btn" @click="view = 'cart'">
-          Ver Carrinho ({{ cartCount }})
+        <button v-if="currentView === 'products'" class="btn" @click="currentView = 'cart'">
+          Ver Carrinho ({{ totalItemsInCart }})
         </button>
-        <button v-else class="btn" @click="view = 'products'">
+        <button v-else class="btn" @click="currentView = 'products'">
           Voltar aos Produtos
         </button>
       </div>
@@ -23,14 +23,14 @@
 
     <main>
       <section
-        v-if="view === 'products'"
+        v-if="currentView === 'products'"
         style="max-width: 1100px; margin: 0 auto; padding: 16px"
       >
-        <ProductList @add="onAdd" />
+        <ProductList @add="handleAddToCart" />
       </section>
 
       <section v-else style="max-width: 820px; margin: 0 auto; padding: 16px">
-        <Cart :items="cartItems" @change="onChange" />
+        <Cart :items="cartItems" @change="handleCartItemsChange" />
       </section>
     </main>
   </div>
@@ -45,17 +45,18 @@ export default defineComponent({
   components: { ProductList, Cart },
   setup() {
     const cartItems = ref<Array<any>>([]);
-    const view = ref<"products" | "cart">("products");
+    const currentView = ref<"products" | "cart">("products");
 
-    const cartCount = computed(() =>
-      cartItems.value.reduce((s, i) => s + (i.quantity ?? 0), 0)
+    const totalItemsInCart = computed(() =>
+      cartItems.value.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity ?? 0), 0)
     );
 
-    function onAdd(product: any) {
-      const name = product.name;
-      let existing = cartItems.value.find((i) => i.name === name);
-      if (existing) {
-        existing.quantity = (existing.quantity ?? 0) + 1;
+    function handleAddToCart(product: any) {
+      const productName = product.name;
+      let existingCartItem = cartItems.value.find((ci: { name: string }) => ci.name === productName);
+
+      if (existingCartItem) {
+        existingCartItem.quantity = (existingCartItem.quantity ?? 0) + 1;
       } else {
         cartItems.value.push({
           name: product.name,
@@ -65,17 +66,22 @@ export default defineComponent({
       }
     }
 
-    function onChange(items: Array<any>) {
-      cartItems.value = items;
+    function handleCartItemsChange(updatedItems: Array<any>) {
+      cartItems.value = updatedItems;
     }
 
-    return { cartItems, onAdd, onChange, view, cartCount };
+    return {
+      cartItems,
+      currentView,
+      totalItemsInCart,
+      handleAddToCart,
+      handleCartItemsChange,
+    };
   },
 });
 </script>
 
 <style>
-/* small local styles (kept minimal - the main styles are in src/styles.css) */
 .text-2xl {
   font-size: 1.5rem;
 }
