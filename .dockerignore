@@ -1,9 +1,0 @@
-node_modules
-frontend/node_modules
-backend/vendor
-**/.git
-**/.env
-**/.DS_Store
-**/dist
-**/tmp
-**/log

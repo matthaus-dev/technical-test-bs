@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: technical_test_backend
+    ports:
+      - "8000:80"       
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: technical_test_frontend
+    ports:
+      - "3000:3000"    
+    networks:
+      - app-network
+  
+  phpunit:
+    build: ./backend
+    container_name: technical_test_phpunit
+    depends_on:
+      - backend
+    command: ["./vendor/bin/phpunit", "tests/Unit", "--testdox"]
+    networks:
+      - app-network
+    restart: "no"
+
+networks:
+  app-network:
+    driver: bridge

@@ -13,6 +13,9 @@ use App\services\ShoppingCartService;
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 
+$displayErrorDetails = false;
+$errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, true, false);
+
 $app->add(function (Request $request, RequestHandler $handler) {
     $response = $handler->handle($request);
     return $response
@@ -40,6 +43,11 @@ $app->post('/cart/total', function (Request $request, Response $response) {
     $result = ShoppingCartService::getTotalCartStatic(is_array($body) ? $body : []);
     $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->get('/', function (Request $request, Response $response, $args) {
+    $response->getBody()->write('API is running');
+    return $response;
 });
 
 $app->run();
