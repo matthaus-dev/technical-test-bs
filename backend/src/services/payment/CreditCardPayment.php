@@ -8,7 +8,7 @@ class CreditCardPayment implements PaymentRuleInterface
 {    
     public function calculate(float $principal, array $options = []): array
     {        
-        $installments = max(1, intval($options['installments'] ?? $options['parcelas'] ?? 1));
+        $installments = max(1, intval($options['installments'] ?? 1));
 
         if ($installments <= 1) {            
             $totalAmount = round($principal * 0.90, 2);

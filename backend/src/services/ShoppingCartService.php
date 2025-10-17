@@ -55,10 +55,4 @@ class ShoppingCartService
             'details' => $details,
         ];
     }
-    
-    public static function getTotalCartStatic(array $payload): array
-    {
-        $svc = new self();
-        return $svc->getTotalCart($payload);
-    }
 }
